@@ -1,0 +1,109 @@
+#:import Toolbar kivymd.toolbar.Toolbar
+#:import MDCard kivymd.card.MDCard
+#:import MD kivymd.textfields.MDTextField
+
+<Tag>:
+    id:tagBox
+    orientation: 'horizontal'
+    pos_hint: {'center_y': 0.5}
+    size_hint: None, None
+    size: dp(100), dp(20)
+
+    RelativeLayout:
+        pos: self.pos
+        canvas:
+            Color:
+                hsv: tagBox.color,.25,.95
+            Rectangle:
+                pos: 0,0
+                size: (self.width-13, self.height)
+            Triangle:
+                points: (self.width-13, 0, self.width-13, self.height, self.width, self.height/2)
+            Color:
+                hsv: 0,0,1
+            Ellipse:
+                pos: self.width-10, self.height/2 - 2
+                size: 4,4
+        BoxLayout:
+            padding: dp(3), dp(0)
+            MDLabel:
+                id: tagLabel
+                text: ''
+
+<TagBar>:
+    size_hint: 0.95, None
+    pos_hint: {'center_x': 0.5}
+    height: dp(60)
+    orientation: 'horizontal'
+
+
+<Item@MDLabel>:
+    text: 'asdf'
+    font_style: 'Body1'
+    theme_text_color: 'Custom'
+    text_color: (0.45,0.45,0.45)
+
+<Entry>:
+    size_hint: 0.9, None
+    pos_hint: {'center_x': 0.5}
+    height: dp(50)
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10), dp(2)
+        spacing: dp(2)
+        BoxLayout:
+            orientation: 'horizontal'
+            MDLabel:
+                id: description
+                size_hint_x: 0.35
+                text: ''
+                theme_text_color: 'Primary'
+            BoxLayout:
+                id: tagList
+                orientation: 'horizontal'
+                size_hint_x: 0.65
+                spacing: dp(5)
+
+
+        BoxLayout:
+            orientation: 'vertical'
+            id: itemList
+            Item:
+
+<HeadBar>:
+
+    title: 'Kollektor'
+    md_bg_color: app.theme_cls.primary_color
+    background_palette: 'Primary'
+    background_hue: '500'
+
+    tagSearch: tagSearch
+    BoxLayout:
+        size_hint_x: None
+        width: dp(200)
+        orientation: 'horizontal'
+        MDTextField:
+            id: tagSearch
+            hint_text: "Enter Tag"
+            foreground_color: (1,1,1,1)
+
+BoxLayout:
+    orientation: 'vertical'
+    HeadBar:
+        id: headBar
+
+    TagBar:
+        id:tagBar
+        
+    MDSeparator:
+        height: dp(1)
+    ScrollView:
+        do_scroll_x: False
+        EntryList:
+            id: entryList
+            orientation: 'vertical'
+            size_hint_y: None
+            height: self.minimum_height
+            padding: dp(4), dp(10)
+            spacing: dp(10)
