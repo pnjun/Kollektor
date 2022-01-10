@@ -1,59 +1,43 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+from kivymd.app import MDApp
+from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.card import MDCard
+from kivymd.uix.toolbar import MDToolbar
 
-#************* IMPORTS **************
-#Kivy Imports
-from kivy.app import App
 from kivy.core.window import Window
 from kivy.properties import ObjectProperty
 from kivy.properties import NumericProperty
-from kivy.uix.boxlayout import BoxLayout
 
-
-#KivyMD Imports
-from kivymd.navigationdrawer import MDNavigationDrawer
-from kivymd.theming import ThemeManager
-from kivymd.card import MDCard
-from kivymd.toolbar import Toolbar
-from kivy.metrics import dp
-
-#Other python imports
 from pony import orm
 
-from Kollektion import *
+from Kollektion import Kollektion
 
-#*********** SETTINGS ****************
-default_window_size = (1400, 930)
-
-#************ CODE *******************
-
-#Widget definitions, the layout of these widgets id definied in the
-#Kollektor.kv file
-class Tag(BoxLayout):
+class Tag(MDBoxLayout):
     color = NumericProperty(0)
-    dbTag = ObjectProperty() #handle to db tag correspoinding to gui instance
+    dbTag = ObjectProperty()  # handle to db tag corresponding to gui instance
 
-    #Takes a db tag handle and populates the tag gui with the appropriate info
+    # Takes a db tag handle and populates the tag gui with the appropriate info
     def __init__(self, tag, *args, **kwargs):
         super(Tag, self).__init__(*args, **kwargs)
         self.dbTag = tag
         self.color = tag.color
         self.ids.tagLabel.text = tag.name
 
-class Entry(MDCard):
-    dbEntry = ObjectProperty() #handle to db entry correspoinding to gui instance
 
-    #Takes a db entry handle and populates the gui with the appropriate info
+class Entry(MDCard):
+    dbEntry = ObjectProperty()  # handle to db entry corresponding to gui instance
+
+    # Takes a db entry handle and populates the gui with the appropriate info
     def __init__(self, entry, *args, **kwargs):
         super(Entry, self).__init__(*args, **kwargs)
         self.dbEntry = entry
         self.ids.description.text = entry.description
         for tag in entry.tags:
-            guiTag = Tag(tag)
-            self.ids.tagList.add_widget(guiTag)
+            gui_tag = Tag(tag)
+            self.ids.tagList.add_widget(gui_tag)
 
-    #Hack della vita
-    #Brutally overriding default shadow behaviour
+    # Hack della vita
+    # Brutally overriding default shadow behaviour
     '''def _update_shadow(self, *args):
         self._shadow = App.get_running_app().theme_cls.quad_shadow
         width = self.width * 1.8
@@ -76,56 +60,56 @@ class Entry(MDCard):
             str(int(round(self.elevation)))]'''
     pass
 
-class EntryList(BoxLayout):
-    #This function accepts a list of tags as input and
-    #populates the entry list with the of corresponding entries
+
+class EntryList(MDBoxLayout):
     @orm.db_session
     def update(self):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
 
         for entry in app.kollektion.Entry.select():
-            guiEntry = Entry(entry)
-            self.add_widget(guiEntry)
+            gui_entry = Entry(entry)
+            self.add_widget(gui_entry)
 
-class TagBar(BoxLayout):
+
+class TagBar(MDBoxLayout):
     def on_children(self, instance, val):
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         app.root.ids.entryList.update()
 
-#The headbar handles all the magic: searching for entries, showing tags etc
-#It is initialized with a db filename and handles to the Tagbar and EntryList
-#that will be used to show the data
-class HeadBar(Toolbar):
+
+class HeadBar(MDToolbar):
     tagSearch = ObjectProperty()
-    #Called when search field is loaded
-    def on_tagSearch(self, instance, textbox):
+
+    # Called when search field is loaded
+    def on_tag_search(self, instance, textbox):
         textbox.bind(on_text_validate=self.validateTag)
 
     @orm.db_session
-    def validateTag(self, textbox):
-        app = App.get_running_app()
+    def validate_tag(self, textbox):
+        app = MDApp.get_running_app()
 
-        #tags = app.kollektion.Tag().select(lambda t: t.name == textbox.text)
-        queryTag = orm.select(t for t in app.kollektion.Tag if t.name == textbox.text).first()
-        if queryTag is not None:
-            guiTag = Tag(queryTag)
+        # tags = app.kollektion.Tag().select(lambda t: t.name == textbox.text)
+        query_tag = orm.select(t for t in app.kollektion.Tag if t.name == textbox.text).first()
+        if query_tag is not None:
+            gui_tag = Tag(query_tag)
             textbox.text = ''
-            app.tagBar.add_widget(guiTag)
+            app.tagBar.add_widget(gui_tag)
 
-#Main class of App
-class Kollektor(App):
-    #Set up basic properties for KivyMD app
-    Window.size = default_window_size
-    theme_cls = ThemeManager()
-    nav_drawer = ObjectProperty()
-    title = "Kollektor"
 
-    #Populate entry list, to be changed
+class Kollektor(MDApp):
+    # Set up basic properties for KivyMD app
+    def __init__(self, **kwargs):
+        self.title = "Kollektor"
+        Window.size = (1400, 900)
+        super().__init__(**kwargs)
+
+    # Populate entry list, to be changed
     def on_start(self):
         self.kollektion = Kollektion('db.sqlite')
         self.tagBar = self.root.ids.tagBar
         self.root.ids.entryList.update()
 
-#Entry point
+
+# Entry point
 if __name__ == '__main__':
     Kollektor().run()
