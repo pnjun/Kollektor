@@ -12,6 +12,7 @@ from pony import orm
 
 from Kollektion import Kollektion
 
+
 class Tag(MDBoxLayout):
     color = NumericProperty(0)
     dbTag = ObjectProperty()  # handle to db tag corresponding to gui instance
@@ -36,30 +37,6 @@ class Entry(MDCard):
             gui_tag = Tag(tag)
             self.ids.tagList.add_widget(gui_tag)
 
-    # Hack della vita
-    # Brutally overriding default shadow behaviour
-    '''def _update_shadow(self, *args):
-        self._shadow = App.get_running_app().theme_cls.quad_shadow
-        width = self.width * 1.8
-        height = self.height * 1.8
-
-        x = self.center_x - width / 2
-        self._soft_shadow_size = (width, height)
-        self._hard_shadow_size = (width, height)
-
-        y = self.center_y - height / 2 - dp(.1 * 1.5 ** self.elevation)
-        self._soft_shadow_pos = (x, y)
-        self._soft_shadow_a = 0.1 * 1.1 ** self.elevation
-        self._soft_shadow_texture = self._shadow.textures[
-            str(int(round(self.elevation - 1)))]
-
-        y = self.center_y - height / 2 - dp(.5 * 1.18 ** self.elevation)
-        self._hard_shadow_pos = (x, y)
-        self._hard_shadow_a = .4 * .9 ** self.elevation
-        self._hard_shadow_texture = self._shadow.textures[
-            str(int(round(self.elevation)))]'''
-    pass
-
 
 class EntryList(MDBoxLayout):
     @orm.db_session
@@ -78,12 +55,6 @@ class TagBar(MDBoxLayout):
 
 
 class HeadBar(MDToolbar):
-    tagSearch = ObjectProperty()
-
-    # Called when search field is loaded
-    def on_tag_search(self, instance, textbox):
-        textbox.bind(on_text_validate=self.validateTag)
-
     @orm.db_session
     def validate_tag(self, textbox):
         app = MDApp.get_running_app()
@@ -106,7 +77,6 @@ class Kollektor(MDApp):
     # Populate entry list, to be changed
     def on_start(self):
         self.kollektion = Kollektion('db.sqlite')
-        self.tagBar = self.root.ids.tagBar
         self.root.ids.entryList.update()
 
 
