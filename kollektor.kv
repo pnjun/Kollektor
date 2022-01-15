@@ -17,7 +17,7 @@
         MDBoxLayout:
             padding: dp(10), dp(5)
             MDLabel:
-                id: tagLabel
+                id: tag_label
                 text: ''
 
 <Item@MDLabel>:
@@ -57,46 +57,55 @@
 
 <TagBar>:
 
-<HeadBar>:
+<TagSearch>:
+
+<FilterBar@BoxLayout>
+    size_hint: 0.95, None
+    pos_hint: {'center_x': 0.5}
+    height: dp(60)
+    orientation: 'horizontal'
+
+    TagBar:
+        id: tag_bar
+
+        size_hint_x: None
+        width: self.minimum_width
+        spacing: dp(10)
+
+    TagSearch:
+        size_hint_y: None
+        height: dp(40)
+        pos_hint: {'center_y': 0.4}
+        multiline: False
+        font_size: 18
+        cursor_color: 0,0,0,1
+        background_color: 1,1,1,0
+        background_normal: ""
+        background_active: ""
+
+        hint_text: "Filter Tags..."
+        hint_text_color: 0.5, 0.5, 0.5, 1
+
+
+
+<HeadBar@MDToolbar>:
     title: 'Kollektor'
 
 MDBoxLayout:
     orientation: 'vertical'
+
     HeadBar:
-        id: headBar
 
-    MDBoxLayout:
-        size_hint: 0.95, None
-        pos_hint: {'center_x': 0.5}
-        height: dp(60)
-        orientation: 'horizontal'
+    FilterBar:
+        id: filter_bar
 
-        TagBar:
-            size_hint_x: None
-            width: self.minimum_width
-
-        TextInput:
-            id: tagSearch
-            size_hint_y: None
-            height: dp(40)
-            pos_hint: {'center_y': 0.4}
-            multiline: False
-            font_size: 18
-            cursor_color: 0,0,0,1
-            background_color: 1,1,1,0
-            background_normal: ""
-            background_active: ""
-
-            hint_text: "Filter Tags..."
-            hint_text_color: 0.5, 0.5, 0.5, 1
-        
     MDSeparator:
         height: dp(1)
     ScrollView:
         do_scroll_x: False
         scroll_wheel_distance: dp(75)
         EntryList:
-            id: entryList
+            id: entry_list
             orientation: 'vertical'
             size_hint_y: None
             height: self.minimum_height
