@@ -86,7 +86,12 @@
         hint_text: "Filter Tags..."
         hint_text_color: 0.5, 0.5, 0.5, 1
 
-
+<EntryList>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    padding: dp(4), dp(10)
+    spacing: dp(10)
 
 <HeadBar@MDToolbar>:
     title: 'Kollektor'
@@ -102,12 +107,7 @@ MDBoxLayout:
     MDSeparator:
         height: dp(1)
     ScrollView:
+        id: entry_scroll
         do_scroll_x: False
         scroll_wheel_distance: dp(75)
-        EntryList:
-            id: entry_list
-            orientation: 'vertical'
-            size_hint_y: None
-            height: self.minimum_height
-            padding: dp(4), dp(10)
-            spacing: dp(10)
+

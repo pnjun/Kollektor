@@ -20,7 +20,7 @@ class Tag(MDBoxLayout):
 
     # Takes a db tag handle and populates the tag gui with the appropriate info
     def __init__(self, tag, *args, **kwargs):
-        super(Tag, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.db_tag = tag
         self.color = tag.color
         self.ids.tag_label.text = tag.name
@@ -31,7 +31,7 @@ class Entry(MDCard):
 
     # Takes a db entry handle and populates the gui with the appropriate info
     def __init__(self, entry, *args, **kwargs):
-        super(Entry, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.db_entry = entry
         self.ids.description.text = entry.description
         for tag in entry.tags:
@@ -41,6 +41,9 @@ class Entry(MDCard):
 
 # TODO: create decorator that sets system_cursor in a context manager
 class EntryList(MDBoxLayout):
+    def __init__(self, tag_list, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.populate(tag_list)
 
     def search_entries(self, tag_list):
         app = MDApp.get_running_app()
@@ -51,13 +54,9 @@ class EntryList(MDBoxLayout):
         return query
 
     @orm.db_session
-    def update(self):
+    def populate(self, tag_list):
         Window.set_system_cursor('wait')
 
-        app = MDApp.get_running_app()
-        tag_list = [t.db_tag for t in app.tag_bar.children]
-
-        self.children = []
         for entry in self.search_entries(tag_list):
             gui_entry = Entry(entry)
             self.add_widget(gui_entry)
@@ -67,7 +66,11 @@ class EntryList(MDBoxLayout):
 class TagBar(MDBoxLayout):
     def on_children(self, instance, val):
         app = MDApp.get_running_app()
-        app.root.ids.entry_list.update()
+        tag_list = [t.db_tag for t in self.children]
+        scroll_view = app.root.ids.entry_scroll
+        if scroll_view.children:
+            scroll_view.remove_widget(scroll_view.children[0])
+        scroll_view.add_widget(EntryList(tag_list))
 
 
 class TagSearch(TextInput):
@@ -117,7 +120,6 @@ class Kollektor(MDApp):
     def on_start(self):
         self.kollektion = Kollektion('db.sqlite')
         self.tag_bar = self.root.ids.filter_bar.ids.tag_bar
-        self.root.ids.entry_list.update()
 
 
 # Entry point
