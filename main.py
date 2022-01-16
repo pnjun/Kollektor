@@ -45,9 +45,10 @@ class EntryList(MDBoxLayout):
     def search_entries(self, tag_list):
         app = MDApp.get_running_app()
 
-        if tag_list:
-            return app.kollektion.Entry.select(lambda e: tag_list[0] in e.tags)
-        return []
+        query = app.kollektion.Entry.select()
+        for tag in tag_list:
+            query = query.filter(lambda e: tag in e.tags)
+        return query
 
     @orm.db_session
     def update(self):
@@ -56,6 +57,7 @@ class EntryList(MDBoxLayout):
         app = MDApp.get_running_app()
         tag_list = [t.db_tag for t in app.tag_bar.children]
 
+        self.children = []
         for entry in self.search_entries(tag_list):
             gui_entry = Entry(entry)
             self.add_widget(gui_entry)
